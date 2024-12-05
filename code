@@ -1,0 +1,928 @@
+# Importing necessary libraries for the ticket booking system
+# - pickle for data serialization
+# - tkinter for creating the graphical user interface (GUI)
+# - datetime for handling date and time operations
+import pickle
+import tkinter as tk
+from tkinter import ttk, messagebox
+from datetime import datetime
+
+class User:
+    def __init__(self, user_id, name, email, password):
+        # Protected attributes using single underscore convention
+        # Indicates these should not be directly accessed outside the class
+        self._user_id = user_id     # Unique identifier for the user
+        self._name = name           # User's full name
+        self._email = email         # User's email address
+        self._password = password   # User's login password
+
+    # Getters and Setters
+    def get_user_id(self):
+        return self._user_id
+
+    def set_user_id(self, user_id):
+        self._user_id = user_id
+
+    def get_name(self):
+        return self._name
+
+    def set_name(self, name):
+        self._name = name
+
+    def get_email(self):
+        return self._email
+
+    def set_email(self, email):
+        self._email = email
+
+    def get_password(self):
+        return self._password
+
+    def set_password(self, password):
+        self._password = password
+
+    # Methods for basic user operations like login and account updates
+    def login(self):
+        # Placeholder login method, prints a login confirmation
+        print(f"{self._name} logged in.")
+
+    def update_account_details(self):
+        # Placeholder method for updating account information
+        print(f"{self._name}'s account details updated.")
+
+class Customer(User):
+    def __init__(self, user_id, name, email, password, phone, dob):
+        super().__init__(user_id, name, email, password)
+        self._phone = phone
+        self._dob = dob
+        self._purchase_history = []  # Aggregation with Purchase
+
+    # Getters and Setters
+    def get_phone(self):
+        return self._phone
+
+    def set_phone(self, phone):
+        self._phone = phone
+
+    def get_dob(self):
+        return self._dob
+
+    def set_dob(self, dob):
+        self._dob = dob
+
+    def get_purchase_history(self):
+        return self._purchase_history
+
+    def set_purchase_history(self, purchase_history) :
+        self._purchase_history = purchase_history
+
+    # Methods
+    def create_account(self):
+        print(f"Customer account for {self.get_name()} created.")
+
+    def view_purchase_history(self):
+        return self._purchase_history
+
+
+class Admin(User):
+    def __init__(self, user_id, name, email, password, admin_id, role, permissions):
+        super().__init__(user_id, name, email, password)
+        self._admin_id = admin_id
+        self._role = role
+        self._permissions = permissions
+
+    # Getters and Setters
+    def get_admin_id(self):
+        return self._admin_id
+
+    def set_admin_id(self, admin_id) :
+        self._admin_id = admin_id
+
+    def get_role(self) :
+        return self._role
+
+    def set_role(self, role):
+        self._role = role
+
+    def get_permissions(self):
+        return self._permissions
+
+    def set_permissions(self, permissions):
+        self._permissions = permissions
+
+    # Methods
+    def view_sales_report(self):
+        print("Viewing sales report.")
+
+    def modify_ticket_discounts(self):
+        print("Modifying ticket discounts.")
+
+    def manage_users(self):
+        print("Managing users.")
+
+class Ticket:
+    def __init__(self, ticket_id, ticket_type, price, validity, discounts):
+        self._ticket_id = ticket_id
+        self._ticket_type = ticket_type
+        self._price = price
+        self._validity = validity
+        self._discounts = discounts
+
+    # Getters and Setters
+    def get_ticket_id(self):
+        return self._ticket_id
+
+    def set_ticket_id(self, ticket_id):
+        self._ticket_id = ticket_id
+
+    def get_ticket_type(self):
+        return self._ticket_type
+
+    def set_ticket_type(self, ticket_type):
+        self._ticket_type = ticket_type
+
+    def get_price(self) :
+        return self._price
+
+    def set_price(self, price):
+        self._price = price
+
+    def get_validity(self) :
+        return self._validity
+
+    def set_validity(self, validity):
+        self._validity = validity
+
+    def get_discounts(self) :
+        return self._discounts
+
+    def set_discounts(self, discounts):
+        self._discounts = discounts
+
+    # Methods
+    def calculate_discount(self):
+        print(f"Calculating discount for ticket {self._ticket_type}.")
+
+class Purchase:
+    def __init__(self, purchase_id, customer_id, ticket_id, purchase_date, total_price):
+        self._purchase_id = purchase_id
+        self._customer_id = customer_id
+        self._ticket_id = ticket_id
+        self._purchase_date = purchase_date
+        self._total_price = total_price
+
+    # Getters and Setters
+    def get_purchase_id(self):
+        return self._purchase_id
+
+    def set_purchase_id(self, purchase_id):
+        self._purchase_id = purchase_id
+
+    def get_customer_id(self):
+        return self._customer_id
+
+    def set_customer_id(self, customer_id):
+        self._customer_id = customer_id
+
+    def get_ticket_id(self):
+        return self._ticket_id
+
+    def set_ticket_id(self, ticket_id):
+        self._ticket_id = ticket_id
+
+    def get_purchase_date(self):
+        return self._purchase_date
+
+    def set_purchase_date(self, purchase_date):
+        self._purchase_date = purchase_date
+
+    def get_total_price(self):
+        return self._total_price
+
+    def set_total_price(self, total_price):
+        self._total_price = total_price
+
+    # Methods
+    def generate_invoice(self):
+        return (
+            f"Purchase ID: {self._purchase_id}\n"
+            f"Customer ID: {self._customer_id}\n"
+            f"Ticket ID: {self._ticket_id}\n"
+            f"Purchase Date: {self._purchase_date}\n"
+            f"Total Price: {self._total_price}\n"
+        )
+
+class Payment:
+    def __init__(self, payment_id, purchase_id, payment_method, payment_date, payment_status):
+        self._payment_id = payment_id
+        self._purchase_id = purchase_id
+        self._payment_method = payment_method
+        self._payment_date = payment_date
+        self._payment_status = payment_status
+
+    # Getters and Setters
+    def get_payment_id(self):
+        return self._payment_id
+
+    def set_payment_id(self, payment_id):
+        self._payment_id = payment_id
+
+    def get_purchase_id(self):
+        return self._purchase_id
+
+    def set_purchase_id(self, purchase_id):
+        self._purchase_id = purchase_id
+
+    def get_payment_method(self):
+        return self._payment_method
+
+    def set_payment_method(self, payment_method) :
+        self._payment_method = payment_method
+
+    def get_payment_date(self):
+        return self._payment_date
+
+    def set_payment_date(self, payment_date):
+        self._payment_date = payment_date
+
+    def get_payment_status(self):
+        return self._payment_status
+
+    def set_payment_status(self, payment_status):
+        self._payment_status = payment_status
+
+    # Methods
+    def process_payment(self):
+        if self._payment_status == "Pending":
+            self._payment_status = "Completed"
+            return "Payment processed successfully."
+        return "Payment has already been processed."
+
+# Save data to binary file
+def save_data(filename, data):
+    with open(filename, 'wb') as file:
+        pickle.dump(data, file)
+
+
+# Load data from binary file
+def load_data(filename):
+    try:
+        with open(filename, 'rb') as file:
+            return pickle.load(file)
+    except FileNotFoundError:
+        return []
+
+
+# Default Data Creation
+def create_default_admin(admins):
+    if not admins:
+        admins = [Admin(1, "Afshan", "afshan@gmail.com", "123", 101, "Admin", ["View Reports", "Modify Discounts"])]
+        save_data("admins.pkl", admins)
+    return admins
+
+def create_default_tickets(tickets):
+    if not tickets:
+        tickets = [
+            Ticket(1, "Single-Day Pass", 275, "1 Day", "None"),
+            Ticket(2, "Two-Day Pass", 480, "2 Days", "10% online discount"),
+            Ticket(3, "Annual Membership", 1840, "1 Year", "15% renewal discount"),
+            Ticket(4, "Child Ticket", 185, "1 Day", "None"),
+            Ticket(5, "Group Ticket", 220, "1 Day", "20% for 20+ group"),
+            Ticket(6, "VIP Experience Pass", 550, "1 Day", "None"),
+        ]
+        save_data("tickets.pkl", tickets)
+    return tickets
+
+# GUI Functions
+def create_login_tab(root, customers, admins, tickets):
+    login_frame = ttk.Frame(root)
+
+    ttk.Label(login_frame, text="Welcome to Ticket Booking System").pack(pady=10)
+    ttk.Label(login_frame, text="Email:").pack()
+    email_entry = ttk.Entry(login_frame)
+    email_entry.pack(pady=5)
+
+    ttk.Label(login_frame, text="Password:").pack()
+    password_entry = ttk.Entry(login_frame, show="*")
+    password_entry.pack(pady=5)
+
+    def validate_login():
+        email = email_entry.get()
+        password = password_entry.get()
+
+        # Check customer login
+        for customer in customers:
+            if customer.get_email() == email and customer.get_password() == password:
+                messagebox.showinfo("Login Success", f"Welcome, {customer.get_name()}!")
+                display_customer_dashboard(root, customer, customers, tickets)
+                return
+
+        # Check admin login
+        for admin in admins:
+            if admin.get_email() == email and admin.get_password() == password:
+                messagebox.showinfo("Login Success", "Welcome, Admin!")
+                display_admin_dashboard(root, admin, customers, tickets)
+                return
+
+        # If not found, prompt to create account
+        response = messagebox.askquestion(
+            "Account Not Found", "User not found. Would you like to create a customer account?"
+        )
+        if response == "yes":
+            create_account(root, customers)
+
+    ttk.Button(login_frame, text="Login", command=validate_login).pack(pady=10)
+    return login_frame
+
+def create_account(root, customers):
+    def save_account():
+        name = name_entry.get()
+        email = email_entry.get()
+        password = password_entry.get()
+        phone = phone_entry.get()
+        dob = dob_entry.get()
+
+        if not name or not email or not password or not phone or not dob:
+            messagebox.showerror("Error", "All fields are required.")
+            return
+
+        new_customer = Customer(
+            len(customers) + 1,
+            name,
+            email,
+            password,
+            phone,
+            dob
+        )
+        customers.append(new_customer)
+        save_data("customers.pkl", customers)
+        messagebox.showinfo("Success", "Customer account created successfully!")
+        create_account_window.destroy()
+
+    # Account creation GUI
+    create_account_window = tk.Toplevel(root)
+    create_account_window.title("Create Customer Account")
+
+    ttk.Label(create_account_window, text="Name:").grid(row=0, column=0, padx=10, pady=5)
+    name_entry = ttk.Entry(create_account_window)
+    name_entry.grid(row=0, column=1)
+
+    ttk.Label(create_account_window, text="Email:").grid(row=1, column=0, padx=10, pady=5)
+    email_entry = ttk.Entry(create_account_window)
+    email_entry.grid(row=1, column=1)
+
+    ttk.Label(create_account_window, text="Password:").grid(row=2, column=0, padx=10, pady=5)
+    password_entry = ttk.Entry(create_account_window, show="*")
+    password_entry.grid(row=2, column=1)
+
+    ttk.Label(create_account_window, text="Phone Number:").grid(row=3, column=0, padx=10, pady=5)
+    phone_entry = ttk.Entry(create_account_window)
+    phone_entry.grid(row=3, column=1)
+
+    ttk.Label(create_account_window, text="Date of Birth (YYYY-MM-DD):").grid(row=4, column=0, padx=10, pady=5)
+    dob_entry = ttk.Entry(create_account_window)
+    dob_entry.grid(row=4, column=1)
+
+    ttk.Button(create_account_window, text="Create Account", command=save_account).grid(row=5, columnspan=2, pady=10)
+
+
+def add_customer(customers):
+    """
+    Adds a new customer to the system.
+    """
+
+    def save_new_customer():
+        name = name_entry.get()
+        email = email_entry.get()
+        password = password_entry.get()
+        phone = phone_entry.get()
+        dob = dob_entry.get()
+
+        if not name or not email or not password or not phone or not dob:
+            messagebox.showerror("Error", "All fields are required.")
+            return
+
+        # Create and add the new customer
+        new_customer = Customer(
+            len(customers) + 1,
+            name,
+            email,
+            password,
+            phone,
+            dob
+        )
+        customers.append(new_customer)
+        save_data("customers.pkl", customers)
+        messagebox.showinfo("Success", "Customer added successfully!")
+        add_customer_window.destroy()
+
+    # GUI for adding a customer
+    add_customer_window = tk.Toplevel()
+    add_customer_window.title("Add Customer")
+
+    ttk.Label(add_customer_window, text="Name:").grid(row=0, column=0, padx=10, pady=5)
+    name_entry = ttk.Entry(add_customer_window)
+    name_entry.grid(row=0, column=1)
+
+    ttk.Label(add_customer_window, text="Email:").grid(row=1, column=0, padx=10, pady=5)
+    email_entry = ttk.Entry(add_customer_window)
+    email_entry.grid(row=1, column=1)
+
+    ttk.Label(add_customer_window, text="Password:").grid(row=2, column=0, padx=10, pady=5)
+    password_entry = ttk.Entry(add_customer_window, show="*")
+    password_entry.grid(row=2, column=1)
+
+    ttk.Label(add_customer_window, text="Phone Number:").grid(row=3, column=0, padx=10, pady=5)
+    phone_entry = ttk.Entry(add_customer_window)
+    phone_entry.grid(row=3, column=1)
+
+    ttk.Label(add_customer_window, text="Date of Birth (YYYY-MM-DD):").grid(row=4, column=0, padx=10, pady=5)
+    dob_entry = ttk.Entry(add_customer_window)
+    dob_entry.grid(row=4, column=1)
+
+    ttk.Button(add_customer_window, text="Add Customer", command=save_new_customer).grid(row=5, columnspan=2, pady=10)
+
+
+def delete_customer(customers):
+    """
+    Deletes a customer by their email.
+    """
+
+    def confirm_delete():
+        email = email_entry.get()
+        customer_to_delete = next((c for c in customers if c.get_email() == email), None)
+
+        if customer_to_delete:
+            customers.remove(customer_to_delete)
+            save_data("customers.pkl", customers)
+            messagebox.showinfo("Success", f"Customer with email {email} has been deleted.")
+            delete_customer_window.destroy()
+        else:
+            messagebox.showerror("Error", "No customer found with the given email.")
+
+    # GUI for deleting a customer
+    delete_customer_window = tk.Toplevel()
+    delete_customer_window.title("Delete Customer")
+
+    ttk.Label(delete_customer_window, text="Enter Customer Email:").grid(row=0, column=0, padx=10, pady=5)
+    email_entry = ttk.Entry(delete_customer_window)
+    email_entry.grid(row=0, column=1)
+
+    ttk.Button(delete_customer_window, text="Delete", command=confirm_delete).grid(row=1, columnspan=2, pady=10)
+
+
+def modify_customer(customers):
+    """
+    Modifies a customer's details.
+    """
+
+    def load_customer_details():
+        email = email_entry.get()
+        customer_to_modify = next((c for c in customers if c.get_email() == email), None)
+
+        if customer_to_modify:
+            # Pre-fill fields with existing details
+            name_entry.insert(0, customer_to_modify.get_name())
+            password_entry.insert(0, customer_to_modify.get_password())
+            phone_entry.insert(0, customer_to_modify.get_phone())
+            dob_entry.insert(0, customer_to_modify.get_dob())
+        else:
+            messagebox.showerror("Error", "No customer found with the given email.")
+
+    def save_modified_details():
+        email = email_entry.get()
+        customer_to_modify = next((c for c in customers if c.get_email() == email), None)
+
+        if customer_to_modify:
+            customer_to_modify.set_name(name_entry.get())
+            customer_to_modify.set_password(password_entry.get())
+            customer_to_modify.set_phone(phone_entry.get())
+            customer_to_modify.set_dob(dob_entry.get())
+
+            save_data("customers.pkl", customers)
+            messagebox.showinfo("Success", "Customer details updated successfully!")
+            modify_customer_window.destroy()
+        else:
+            messagebox.showerror("Error", "Failed to save changes. Customer not found.")
+
+    # GUI for modifying customer details
+    modify_customer_window = tk.Toplevel()
+    modify_customer_window.title("Modify Customer")
+
+    ttk.Label(modify_customer_window, text="Enter Customer Email:").grid(row=0, column=0, padx=10, pady=5)
+    email_entry = ttk.Entry(modify_customer_window)
+    email_entry.grid(row=0, column=1)
+
+    ttk.Button(modify_customer_window, text="Load Details", command=load_customer_details).grid(row=1, columnspan=2,
+                                                                                                pady=10)
+
+    ttk.Label(modify_customer_window, text="Name:").grid(row=2, column=0, padx=10, pady=5)
+    name_entry = ttk.Entry(modify_customer_window)
+    name_entry.grid(row=2, column=1)
+
+    ttk.Label(modify_customer_window, text="Password:").grid(row=3, column=0, padx=10, pady=5)
+    password_entry = ttk.Entry(modify_customer_window, show="*")
+    password_entry.grid(row=3, column=1)
+
+    ttk.Label(modify_customer_window, text="Phone:").grid(row=4, column=0, padx=10, pady=5)
+    phone_entry = ttk.Entry(modify_customer_window)
+    phone_entry.grid(row=4, column=1)
+
+    ttk.Label(modify_customer_window, text="Date of Birth:").grid(row=5, column=0, padx=10, pady=5)
+    dob_entry = ttk.Entry(modify_customer_window)
+    dob_entry.grid(row=5, column=1)
+
+    ttk.Button(modify_customer_window, text="Save Changes", command=save_modified_details).grid(row=6, columnspan=2,
+                                                                                                pady=10)
+
+
+def view_customers(customers):
+    """
+    Displays all customer details.
+    """
+    view_window = tk.Toplevel()
+    view_window.title("View Customers")
+    ttk.Label(view_window, text="Customer List", font=("Helvetica", 14, "bold")).pack(pady=10)
+
+    # If no customers exist
+    if not customers:
+        ttk.Label(view_window, text="No customers found in the system.").pack(pady=10)
+        return
+
+    # Display customer details
+    for customer in customers:
+        customer_info = (
+            f"ID: {customer.get_user_id()}\n"
+            f"Name: {customer.get_name()}\n"
+            f"Email: {customer.get_email()}\n"
+            f"Phone: {customer.get_phone()}\n"
+            f"Date of Birth: {customer.get_dob()}\n"
+            f"---------------------"
+        )
+        ttk.Label(view_window, text=customer_info, font=("Helvetica", 10)).pack(pady=5)
+
+
+def view_modify_delete_purchase_orders(customers):
+    """
+    View, modify, or delete a customer's purchase orders.
+    """
+    def load_purchases():
+        email = email_entry.get()
+        customer = next((c for c in customers if c.get_email() == email), None)
+
+        if customer:
+            purchases = customer.get_purchase_history()
+            if not purchases:
+                messagebox.showinfo("Info", "No purchase orders found for this customer.")
+                return
+
+            for i, purchase_data in enumerate(purchases, start=1):
+                purchase = purchase_data['purchase']
+                ticket_id = purchase.get_ticket_id()
+                total_price = purchase.get_total_price()
+                purchase_date = purchase.get_purchase_date()
+
+                purchase_info = (
+                    f"Purchase #{i}:\n"
+                    f"Ticket ID: {ticket_id}\n"
+                    f"Total Price: ${total_price:.2f}\n"
+                    f"Purchase Date: {purchase_date}\n"
+                    f"---------------------"
+                )
+                ttk.Label(purchase_frame, text=purchase_info, font=("Helvetica", 10)).pack(pady=5)
+        else:
+            messagebox.showerror("Error", "No customer found with the given email.")
+
+    def delete_purchase():
+        email = email_entry.get()
+        customer = next((c for c in customers if c.get_email() == email), None)
+
+        if customer:
+            purchase_id = int(purchase_id_entry.get())
+            purchases = customer.get_purchase_history()
+
+            if 0 < purchase_id <= len(purchases):
+                purchases.pop(purchase_id - 1)
+                save_data("customers.pkl", customers)
+                messagebox.showinfo("Success", f"Purchase #{purchase_id} deleted successfully.")
+                view_modify_delete_window.destroy()
+            else:
+                messagebox.showerror("Error", "Invalid purchase ID.")
+        else:
+            messagebox.showerror("Error", "No customer found with the given email.")
+
+    # GUI for viewing, modifying, or deleting purchase orders
+    view_modify_delete_window = tk.Toplevel()
+    view_modify_delete_window.title("Manage Purchase Orders")
+
+    ttk.Label(view_modify_delete_window, text="Enter Customer Email:").grid(row=0, column=0, padx=10, pady=5)
+    email_entry = ttk.Entry(view_modify_delete_window)
+    email_entry.grid(row=0, column=1)
+
+    ttk.Button(view_modify_delete_window, text="Load Purchases", command=load_purchases).grid(row=1, columnspan=2, pady=10)
+
+    ttk.Label(view_modify_delete_window, text="Enter Purchase ID to Delete:").grid(row=2, column=0, padx=10, pady=5)
+    purchase_id_entry = ttk.Entry(view_modify_delete_window)
+    purchase_id_entry.grid(row=2, column=1)
+
+    ttk.Button(view_modify_delete_window, text="Delete Purchase", command=delete_purchase).grid(row=3, columnspan=2, pady=10)
+
+    # Frame to display purchase orders
+    purchase_frame = ttk.Frame(view_modify_delete_window)
+    purchase_frame.grid(row=4, columnspan=2, padx=10, pady=10)
+
+
+def display_customer_dashboard(root, customer, customers, tickets):
+    customer_window = tk.Toplevel(root)
+    customer_window.title("Customer Dashboard")
+
+    ttk.Label(customer_window, text=f"Welcome, {customer.get_name()}!").pack(pady=10)
+    ttk.Button(customer_window, text="Purchase Ticket",
+               command=lambda: purchase_ticket(customer, tickets, customers)).pack(pady=5)  # Pass customers
+    ttk.Button(customer_window, text="View Purchase History",
+               command=lambda: view_purchase_history(customer, tickets)).pack(pady=5)
+
+def display_admin_dashboard(root, admin, customers, tickets):
+    """
+    Admin dashboard with additional account management options.
+    """
+    admin_window = tk.Toplevel(root)
+    admin_window.title("Admin Dashboard")
+
+    ttk.Label(admin_window, text="Admin Dashboard", font=("Helvetica", 14, "bold")).pack(pady=10)
+
+    ttk.Button(admin_window, text="View Customers", command=lambda: view_customers(customers)).pack(pady=5)
+    ttk.Button(admin_window, text="Add Customer", command=lambda: add_customer(customers)).pack(pady=5)
+    ttk.Button(admin_window, text="Modify Customer", command=lambda: modify_customer(customers)).pack(pady=5)
+    ttk.Button(admin_window, text="Delete Customer", command=lambda: delete_customer(customers)).pack(pady=5)
+    ttk.Button(admin_window, text="Manage Purchase Orders", command=lambda: view_modify_delete_purchase_orders(customers)).pack(pady=5)
+    ttk.Button(admin_window, text="View Sales Report", command=lambda: view_sales_report(customers, tickets)).pack(pady=5)
+    ttk.Button(admin_window, text="Modify Discounts", command=lambda: modify_discounts(tickets)).pack(pady=5)
+
+def purchase_ticket(customer, tickets, customers):  # Add customers as a parameter
+    def complete_purchase():
+        try:
+            selected_ticket = ticket_menu.get()
+            payment_method = payment_menu.get()
+
+            if not selected_ticket:
+                messagebox.showerror("Error", "Please select a ticket.")
+                return
+            if not payment_method:
+                messagebox.showerror("Error", "Please select a payment method.")
+                return
+
+            # Safely extract ticket ID
+            ticket_id = int(selected_ticket.split("-")[0].strip())
+
+            # Find ticket safely
+            ticket = next((t for t in tickets if t.get_ticket_id() == ticket_id), None)
+            if not ticket:
+                messagebox.showerror("Error", "Invalid ticket selected.")
+                return
+
+            # Calculate price with discount
+            original_price = ticket.get_price()
+            discount = ticket.get_discounts()
+            discounted_price = original_price
+
+            if discount and "%" in discount:
+                discount_percentage = float(discount.split("%")[0]) / 100
+                discounted_price = original_price * (1 - discount_percentage)
+
+            # Safely generate purchase ID
+            purchase_id = len(customer.get_purchase_history()) + 1
+
+            # Create purchase and payment
+            purchase = Purchase(
+                purchase_id,
+                customer.get_user_id(),
+                ticket.get_ticket_id(),
+                datetime.now().strftime("%Y-%m-%d"),
+                discounted_price
+            )
+            payment = Payment(
+                purchase_id,
+                purchase_id,
+                payment_method,
+                datetime.now().strftime("%Y-%m-%d"),
+                "Completed"
+            )
+
+            # Save purchase
+            customer.get_purchase_history().append({"purchase": purchase, "payment": payment})
+
+            # Update the specific customer in the customers list
+            for i, c in enumerate(customers):
+                if c.get_user_id() == customer.get_user_id():
+                    customers[i] = customer
+                    break
+
+            save_data("customers.pkl", customers)
+
+            # Confirmation
+            messagebox.showinfo(
+                "Success",
+                f"Ticket purchased successfully!\n"
+                f"Original Price: ${original_price:.2f}\n"
+                f"Discount Applied: {discount or 'None'}\n"
+                f"Total Price: ${discounted_price:.2f}\n"
+                f"Ticket Validity: {ticket.get_validity()}\n"
+                f"Payment Method: {payment_method}"
+            )
+            purchase_window.destroy()
+
+        except Exception as e:
+            print(f"Unexpected error during purchase: {e}")
+            messagebox.showerror("Error", f"An unexpected error occurred: {e}")
+
+    purchase_window = tk.Toplevel()
+    purchase_window.title("Purchase Ticket")
+
+    ttk.Label(purchase_window, text="Select Ticket:").grid(row=0, column=0, padx=10, pady=5)
+    ticket_menu = ttk.Combobox(
+        purchase_window,
+        values=[
+            f"{t.get_ticket_id()} - {t.get_ticket_type()} - ${t.get_price()} - Validity: {t.get_validity()} - Discount: {t.get_discounts()}"
+            for t in tickets
+        ]
+    )
+    ticket_menu.grid(row=0, column=1)
+
+    ttk.Label(purchase_window, text="Select Payment Method:").grid(row=1, column=0, padx=10, pady=5)
+    payment_menu = ttk.Combobox(
+        purchase_window,
+        values=["Credit Card", "Debit Card", "Digital Wallet", "Cash"]
+    )
+    payment_menu.grid(row=1, column=1)
+
+    ttk.Button(purchase_window, text="Complete Purchase", command=complete_purchase).grid(row=2, columnspan=2, pady=10)
+def view_purchase_history(customer, tickets):
+    history_window = tk.Toplevel()
+    history_window.title("Purchase History")
+
+    if not customer.get_purchase_history():
+        ttk.Label(history_window, text="No purchase history available.").pack(pady=10)
+        return
+
+    for i, history in enumerate(customer.get_purchase_history(), start=1):
+        purchase = history["purchase"]
+        payment = history["payment"]
+        ticket = next((t for t in tickets if t.get_ticket_id() == purchase.get_ticket_id()), None)
+        ticket_type = ticket.get_ticket_type() if ticket else "Unknown Ticket"
+
+        ttk.Label(
+            history_window,
+            text=(
+                f"Purchase #{i}\n"
+                f"Ticket: {ticket_type}\n"
+                f"Date: {purchase.get_purchase_date()}\n"
+                f"Total: ${purchase.get_total_price():.2f}\n"
+                f"Payment Method: {payment.get_payment_method()}\n"
+                f"Payment Status: {payment.get_payment_status()}\n"
+                f"-----------------------"
+            )
+        ).pack(pady=5)
+
+def view_sales_report(customers, tickets):
+    """
+    Displays the sales report for admins.
+    """
+    # Calculate total sales by summing the total price of all purchases
+    total_sales = sum(
+        p['purchase'].get_total_price()
+        for c in customers
+        for p in c.get_purchase_history()
+    )
+
+    # Count the total number of tickets sold
+    tickets_sold = sum(len(c.get_purchase_history()) for c in customers)
+
+    # Create a detailed sales report window
+    report_window = tk.Toplevel()
+    report_window.title("Comprehensive Sales Report")
+    report_window.geometry("400x600")  # Set a reasonable window size
+
+    # Main report title
+    ttk.Label(report_window, text="Sales Report", font=('Helvetica', 16, 'bold')).pack(pady=15)
+
+    # Overall sales statistics
+    stats_frame = ttk.Frame(report_window)
+    stats_frame.pack(pady=10)
+
+    ttk.Label(stats_frame, text=f"Total Tickets Sold: {tickets_sold}", font=('Helvetica', 12)).pack(pady=5)
+    ttk.Label(stats_frame, text=f"Total Sales: ${total_sales:.2f}", font=('Helvetica', 12)).pack(pady=5)
+
+    # Ticket type breakdown
+    ttk.Label(report_window, text="Ticket Type Breakdown", font=('Helvetica', 14, 'bold')).pack(pady=10)
+
+    # Count sales by ticket type
+    ticket_sales = {}
+    ticket_revenue = {}
+
+    for customer in customers:
+        for purchase_data in customer.get_purchase_history():
+            purchase = purchase_data['purchase']
+            ticket = next((t for t in tickets if t.get_ticket_id() == purchase.get_ticket_id()), None)
+
+            if ticket:
+                ticket_type = ticket.get_ticket_type()
+                # Count ticket sales
+                ticket_sales[ticket_type] = ticket_sales.get(ticket_type, 0) + 1
+
+                # Calculate revenue by ticket type
+                ticket_revenue[ticket_type] = ticket_revenue.get(ticket_type, 0) + purchase.get_total_price()
+
+    # Create a frame for ticket type details
+    ticket_frame = ttk.Frame(report_window)
+    ticket_frame.pack(pady=10)
+
+    # Display detailed breakdown of ticket types
+    for ticket_type in ticket_sales:
+        ticket_details_label = ttk.Label(
+            ticket_frame,
+            text=(
+                f"{ticket_type}: \n"
+                f"  Tickets Sold: {ticket_sales[ticket_type]} \n"
+                f"  Revenue: ${ticket_revenue[ticket_type]:.2f}"
+            ),
+            font=('Helvetica', 10)
+        )
+        ticket_details_label.pack(pady=5, anchor='w')
+
+    # Add a close button
+    ttk.Button(report_window, text="Close", command=report_window.destroy).pack(pady=15)
+
+
+def modify_discounts(tickets):
+    def update_discount():
+        selected_ticket = ticket_menu.get()
+        new_discount = discount_entry.get()
+
+        if not selected_ticket or not new_discount:
+            messagebox.showerror("Error", "Please select a ticket and enter a new discount.")
+            return
+
+        try:
+            ticket_id = int(selected_ticket.split("-")[0])  # Extract ticket ID
+            ticket = next((t for t in tickets if t.get_ticket_id() == ticket_id), None)
+
+            if ticket:
+                # Since the Ticket class doesn't have a set_discounts method,
+                # we'll modify it directly (you might want to add a setter method to the Ticket class)
+                ticket._discounts = new_discount  # Note: directly modifying private attribute
+
+                save_data("tickets.pkl", tickets)
+                messagebox.showinfo(
+                    "Success",
+                    f"Discount for {ticket.get_ticket_type()} updated to: {new_discount}"
+                )
+                modify_discount_window.destroy()
+            else:
+                messagebox.showerror("Error", "Invalid ticket selected.")
+
+        except ValueError:
+            messagebox.showerror("Error", "Invalid ticket selection.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An unexpected error occurred: {str(e)}")
+
+    # Create a new window for modifying discounts
+    modify_discount_window = tk.Toplevel()
+    modify_discount_window.title("Modify Ticket Discounts")
+
+    ttk.Label(modify_discount_window, text="Select Ticket:").grid(row=0, column=0, padx=10, pady=5)
+    ticket_menu = ttk.Combobox(
+        modify_discount_window,
+        values=[
+            f"{t.get_ticket_id()} - {t.get_ticket_type()} - Current Discount: {t.get_discounts()}"
+            for t in tickets
+        ]
+    )
+    ticket_menu.grid(row=0, column=1)
+
+    ttk.Label(modify_discount_window, text="New Discount:").grid(row=1, column=0, padx=10, pady=5)
+    discount_entry = ttk.Entry(modify_discount_window)
+    discount_entry.grid(row=1, column=1)
+
+    ttk.Button(modify_discount_window, text="Update Discount", command=update_discount).grid(row=2, columnspan=2,
+                                                                                             pady=10)
+def main():
+    customers = load_data("customers.pkl")
+    admins = load_data("admins.pkl")
+    tickets = load_data("tickets.pkl")
+
+    admins = create_default_admin(admins)
+    tickets = create_default_tickets(tickets)
+
+    root = tk.Tk()
+    root.title("Ticket Booking System")
+
+    tabs = ttk.Notebook(root)
+    login_tab = create_login_tab(tabs, customers, admins, tickets)
+    tabs.add(login_tab, text="Login")
+    tabs.pack(expand=1, fill="both")
+
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()
